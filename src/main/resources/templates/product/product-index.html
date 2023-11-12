@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout :: head}"></head>
+<body class="main-body" th:data-role="${#authentication.getAuthorities()}">
+	<nav th:replace="~{layout :: navigation}"></nav>
+	<header th:replace="~{layout :: header (${breadCrumbs})}"></header>
+	<main>
+		<div class="grid-container product-index">
+		    <form method="get" class="filter" th:attr="action=@{/product/index}">
+		        <input type="text" name="name" placeholder="Product Name..." th:attr="value=${name}">
+		        <select name="categoryId">
+		        	<option th:value="null">No Specific Category</option>
+			        <option th:each="option : ${categoryDropdown}" th:value="${option.longValue}" 
+			        	th:text="${option.text}" th:selected="${option.longValue == categoryId}"></option>
+		        </select>
+		        <select name="supplierId">
+		        	<option th:value="null">No Specific Supplier</option>
+			        <option th:each="option : ${supplierDropdown}" th:value="${option.longValue}" 
+			        	th:text="${option.text}" th:selected="${option.longValue == supplierId}"></option>
+		        </select>        
+		        <button class="blue-button" type="submit">Search</button>
+		    </form>
+		    <a class="blue-button create-button" th:href="@{/product/upsertForm}">Insert New Product</a>
+			<table>
+		        <thead>
+		            <tr>
+		                <th>Action</th>
+		                <th>Name</th>
+		                <th>Supplier</th>
+		                <th>Category</th>
+		                <th>Price</th>
+		            </tr>
+		        </thead>
+				<tbody>
+					<tr th:each="product : ${grid}">
+						<td>
+							<a th:href="@{/product/upsertForm(id=${product.id})}" class="blue-button update-button">Edit</a>
+							<a th:href="@{/product/delete(id=${product.id})}" class="blue-button delete-button">Delete</a>
+						</td>
+						<td th:text="${product.name}"></td>
+						<td th:text="${product.supplier}"></td>
+						<td th:text="${product.category}"></td>
+						<td th:text="${#numbers.formatCurrency(product.price)}"></td>
+					</tr>
+				</tbody>
+				<tfoot>
+		            <tr>
+		                <td colspan="5">
+		                    <div class="pagination">
+		                        <div th:text="|page ${currentPage} of ${totalPages}|"></div>
+		                        <div>
+									<a th:each="loop:${#numbers.sequence(1,totalPages)}" 
+										th:href="@{/product/index(page=${loop},name=${name},categoryId=${categoryId},supplierId=${supplierId})}"
+										th:text="${loop}"></a>
+		                        </div>
+		                    </div>
+		                </td>
+		            </tr>
+		        </tfoot>
+			</table>
+		</div>
+	</main>
+	<footer th:replace="~{layout :: footer}"></footer>
+	<th:block th:replace="~{layout :: javascript}"></th:block>
+</body>
+</html>
